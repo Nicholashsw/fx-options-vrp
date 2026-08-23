@@ -1,0 +1,25 @@
+metric,target_prior_laptop,this_rebuild,status
+clean_v3 monthly files,193,193,EXACT
+clean_v3 total rows,"32,525,026","32,525,006","-20 rows (0.00006%), no downstream effect"
+clean_v3 dup rows,0,0,EXACT
+clean_v3 source rule errors,0,0,EXACT
+max future_symbol_missing_pct,0.0,0.0,EXACT
+max future_settle_missing_pct,~0.086,0.0862 (2014-09),EXACT
+roots present post-2018,all 7,all 7,EXACT
+join diag 2016-01 defs/settle,"7,241 / 121,044","7,241 / 121,044",EXACT
+join diag 2024-01 new defs/settle,"11,992 / 233,574","11,992 / 233,574",EXACT
+join diag 2024-01 old6N defs/settle,"484 / 8,818","484 / 8,818",EXACT
+ATM rows after global dedup+rerank,"440,467","440,467",EXACT
+ATM date range,2010-06-04..2026-06-26,same,EXACT
+ATM dups by date/root/tenor/type/rank,0,0,EXACT
+ATM rows by root,63798/63798/63798/63786/63798/57703/63786,same,EXACT all 7
+ATM rows by tenor,157579/151002/131886,same,EXACT
+valid IV rows,"440,462 (99.9989%)","440,462 (99.9989%)",EXACT
+invalid IV rows,5,5 (below_intrinsic),EXACT
+median IV by root (pre-filter),6 targets,all match to 1e-6,EXACT
+research rows after IV range,"440,440","440,440",EXACT
+dropped early 6N,"9,810","9,810",EXACT
+final research rows,"430,630","430,630",EXACT
+research median IV by root,7 targets,all match to 1e-6,EXACT
+VRP rows rv_status ok,(new),"427,774 / 430,630 (99.34%)",NEW
+VRP median vol spread,(new),+0.39..+0.87 vol pts ex-6N; 6N -0.05,NEW

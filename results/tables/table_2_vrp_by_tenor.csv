@@ -1,0 +1,4 @@
+target_tenor,median_vrp_spread,positive_pct,n_obs
+30,0.5665,62.5474,25336
+60,0.5027,62.4106,24185
+90,0.4939,62.7283,21193
