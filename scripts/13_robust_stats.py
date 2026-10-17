@@ -18,10 +18,11 @@ import statsmodels.api as sm
 HERE = os.path.dirname(os.path.abspath(__file__))
 WORK = os.environ.get("FX_VRP_WORK", os.path.dirname(HERE))
 VD = os.path.join(WORK, "clean_v3", "vrp_v3")
-OUTD = os.path.join(VD, "robust_stats_step13")
+SFX = f"_{os.environ['FX_VRP_VARIANT']}" if os.environ.get("FX_VRP_VARIANT") else ""  # see step 11
+OUTD = os.path.join(VD, "robust_stats_step13" + SFX)
 os.makedirs(OUTD, exist_ok=True)
 
-allp = pd.read_parquet(os.path.join(VD, "strategy_step12",
+allp = pd.read_parquet(os.path.join(VD, "strategy_step12" + SFX,
                                     "strategy_daily_payoff_proxy_v3.parquet"))
 
 def nw_t(y, lag):

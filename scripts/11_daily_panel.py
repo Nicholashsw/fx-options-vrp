@@ -5,6 +5,11 @@ target_tenor) cell the up-to-6 selected ATM contracts (calls and puts, top 3
 by the step-6 rerank) are equal-weight averaged.
 
 Output: clean_v3/vrp_v3/daily_panel_step11/daily_vrp_panel_v3.parquet
+
+FX_VRP_VARIANT=intraday (or settlematched) reads vrp_panel_v3_<variant>.parquet,
+written by step 16, and writes to daily_panel_step11_<variant>/ instead, so steps
+11-13 can be re-run on another realised-volatility estimator without touching the
+main results.
 """
 import os
 import pandas as pd
@@ -12,10 +17,11 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 WORK = os.environ.get("FX_VRP_WORK", os.path.dirname(HERE))
 VD = os.path.join(WORK, "clean_v3", "vrp_v3")
-OUTD = os.path.join(VD, "daily_panel_step11")
+SFX = f"_{os.environ['FX_VRP_VARIANT']}" if os.environ.get("FX_VRP_VARIANT") else ""
+OUTD = os.path.join(VD, "daily_panel_step11" + SFX)
 os.makedirs(OUTD, exist_ok=True)
 
-df = pd.read_parquet(os.path.join(VD, "vrp_panel_v3.parquet"))
+df = pd.read_parquet(os.path.join(VD, f"vrp_panel_v3{SFX}.parquet"))
 ok = df[df.rv_status == "ok"].copy()
 
 # 6N anomaly extension (finalization finding): the structurally suspicious
