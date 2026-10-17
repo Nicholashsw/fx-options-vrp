@@ -7,3 +7,4 @@ matplotlib>=3.7
 nbformat>=5.9
 nbclient>=0.9
 databento>=0.30
+pytest>=8
