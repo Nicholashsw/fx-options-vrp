@@ -92,11 +92,25 @@ Full methodological rules, join logic and known data notes are in `report/vrp_re
 | 13 | `13_robust_stats.py` | NW 5/21/63 t, non-overlap t, skew/kurtosis | 12-row summary |
 | 14 | `14_charts_tables.py` | publication charts and tables 1–4 | 7 charts, 4 tables |
 | — | `build_notebook.py` | build and execute `notebooks/vrp_analysis.ipynb` | notebook |
+| 15 | `15_intraday_bars.py` | Databento one-minute futures bars, monthly CSVs for q | — |
+| 16 | `16_intraday_rv.py` | forward RV from 5-minute returns (q/ or pandas); settlement and intraday panels on the same rows | — |
+| 17 | `17_rv_estimator_compare.py` | the twelve strategies under each estimator | — |
 
 Steps 1, 2, 4, 6 and 9 are long and accept `--budget <minutes>` for resumable batches. The rebuild
 from the Databento download matched the original pipeline on 21 of the 22 comparable metrics in
 `diagnostics/reproduction_scorecard.csv`; the single difference is 20 rows in 32.5 million
 (Databento reprocessing, no downstream effect), and every derived panel reproduces exactly.
+
+## In progress: does the premium survive a better realised-volatility estimator?
+
+Forward realised volatility here comes from about 21 daily settlement returns for a 30-day option. That
+estimator is unbiased for variance, but realised volatility is its square root, so its noise biases
+volatility down and the IV − RV spread up, by more at shorter tenors. Steps 15 to 17 and the kdb+/q
+code in [`q/`](q/README.md) rebuild the realised leg from five-minute returns of the same futures
+contracts over the same settlement-to-settlement sessions, then re-run steps 11 to 13 on identical
+option rows under each estimator (`FX_VRP_VARIANT=settlematched` / `intraday`). The pandas reference
+(`scripts/intraday_rv.py`, tested in `tests/`) runs; the q side has not been run on a licensed install
+yet, and none of this leg's numbers are in the paper until it has.
 
 ## Reproducing
 
@@ -125,7 +139,9 @@ Databento jobs needed to re-create the panel are listed in `DATA.md`.
 ## Repository layout
 
 ```
-scripts/            pipeline steps 00–14 + build_notebook.py
+scripts/            pipeline steps 00–17, build_notebook.py, intraday_rv.py (pandas reference for q/)
+q/                  kdb+/q intraday realised-volatility engine (HDB, window joins, tickerplant)
+tests/              tests for the intraday measures
 paper/              vrp_paper.pdf, vrp_paper.tex, figs/ (the 7 charts, 200 dpi)
 report/             vrp_report_final.md (long-form report)
 notebooks/          vrp_analysis.ipynb (executed, outputs retained)

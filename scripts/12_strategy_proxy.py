@@ -28,13 +28,14 @@ import pandas as pd
 HERE = os.path.dirname(os.path.abspath(__file__))
 WORK = os.environ.get("FX_VRP_WORK", os.path.dirname(HERE))
 VD = os.path.join(WORK, "clean_v3", "vrp_v3")
-OUTD = os.path.join(VD, "strategy_step12")
+SFX = f"_{os.environ['FX_VRP_VARIANT']}" if os.environ.get("FX_VRP_VARIANT") else ""  # see step 11
+OUTD = os.path.join(VD, "strategy_step12" + SFX)
 os.makedirs(OUTD, exist_ok=True)
 
 MAJORS = ["6E", "6B", "6J", "6S"]
 Z_WINDOW, Z_MIN = 252, 126
 
-d = pd.read_parquet(os.path.join(VD, "daily_panel_step11",
+d = pd.read_parquet(os.path.join(VD, "daily_panel_step11" + SFX,
                                  "daily_vrp_panel_v3.parquet"))
 d = d.sort_values(["economic_root", "target_tenor", "date"], kind="stable")
 
