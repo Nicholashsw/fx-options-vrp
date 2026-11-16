@@ -15,11 +15,12 @@ def run():
     df = pd.read_parquet(os.path.join(VD, "vrp_panel_v3.parquet"))
     ok = df[df.rv_status == "ok"].copy()
 
-    # 6N anomaly extension (finalization finding): the structurally suspicious
-    # legacy 6N IV regime (30-40% prints with zero open interest against ~8%
-    # realized) persists through 2013, not just pre-2013.
-    # 102 of 103 zero-OI IV>20% artifact days are 6N in 2013; high-IV days for
-    # other roots coincide with genuine stress (2011, Brexit, SNB de-peg, COVID).
+    # 6N anomaly: in 2013 legacy 6N options still settle at implied volatility
+    # above 20% (median 28.5%) against a median realised volatility of 9.5%.
+    # 102 of the 128 daily cells with IV > 20% and no recorded open interest
+    # are 6N in 2013; high-IV days for other roots coincide with market stress
+    # (2011, Brexit, SNB de-peg, COVID). The cut-off was chosen after comparing
+    # implied with realised volatility over the full sample.
     # Rule: 6N enters the sample 2014-01-01.
     n_drop = ((ok.economic_root == "6N") & (ok.date < "2014-01-01")).sum()
     ok = ok[~((ok.economic_root == "6N") & (ok.date < "2014-01-01"))]

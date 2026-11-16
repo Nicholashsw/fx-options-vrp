@@ -45,6 +45,6 @@ Submit the six jobs above (or equivalent ranges) from your own Databento account
 `GLBX-*` job folders under one directory. Point `DATABENTO_BASE` at that directory and
 `FX_VRP_WORK` at the working directory the pipeline should build into (conventionally
 `$DATABENTO_BASE/fx_vrp_work`), then run `scripts/00_inventory.py` through
-`14_charts_tables.py`. Expected row counts at every stage are in `README.md` and
+`10_vrp.py` and `run.py`. Expected row counts at every stage are in `README.md` and
 `diagnostics/reproduction_scorecard.csv`; `REPRO.md` gives the full working-directory layout and
 the checkpoints for the analysis layer.

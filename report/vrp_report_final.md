@@ -305,6 +305,6 @@ A static short-volatility payoff proxy is positive but only marginally significa
 - A3. Black-76 formulas and implementation notes (scripts/07_black76_iv.py)
 - A4. IV solver validation (status counts, below-intrinsic handling, 6N diagnostic)
 - A5. VRP construction details (per-instrument forward RV, trading-day annualization, rv_status flags; scripts/10_vrp.py)
-- A6. Strategy definitions (all twelve variants; z-score: trailing 252-observation rolling mean and standard deviation ending at t-1, minimum 126 observations; scripts/12_strategy_proxy.py)
-- A7. Robust statistics methodology (NW lags 5/21/63; 21-offset non-overlapping scheme; scripts/13_robust_stats.py)
+- A6. Strategy definitions (all twelve variants; z-score: trailing 252-observation rolling mean and standard deviation ending at t-1, minimum 126 observations; fxvrp/signals.py and fxvrp/strategy.py)
+- A7. Robust statistics methodology (NW lags 5/21/63; 21-offset non-overlapping scheme; fxvrp/stats.py)
 - A8. Additional charts (clean_v3/vrp_v3/charts_step14)
