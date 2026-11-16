@@ -21,9 +21,11 @@ export DATABENTO_BASE=/path/to/databento          # holds the GLBX-2026... job f
 export FX_VRP_WORK=$DATABENTO_BASE/fx_vrp_work    # holds parquet/, clean_v3/, diagnostics/
 ```
 
-Unset, `DATABENTO_BASE` falls back to the repository's parent directory and
-`FX_VRP_WORK` to the repository root. Set both explicitly for a real run: the
-working directory grows to tens of gigabytes and must not land inside the repo.
+Set both explicitly. Unset, `DATABENTO_BASE` falls back to the repository's
+parent directory. `FX_VRP_WORK` then falls back to `fx_vrp_work` beside the
+repository in steps 00 and 01, and to the repository root in every later step,
+where a run would overwrite the committed `diagnostics/` files and notebook.
+The working directory grows to tens of gigabytes.
 
 The pipeline creates:
 
@@ -57,20 +59,23 @@ crashes) with the packages in `requirements.txt`.
 
 ```
 python scripts/00_inventory.py             # reads $DATABENTO_BASE
-python scripts/01_convert.py --budget 30   # DBN.ZST -> parquet; repeat until it prints ALL_DONE
+python scripts/01_convert.py --budget 30   # DBN.ZST -> parquet; 30 seconds a call, repeat until it prints ALL_DONE
 python scripts/02_coverage_audit.py        # steps 02-14 use $FX_VRP_WORK only
 python scripts/03_join_diagnostic.py
 python scripts/04_build_clean_v3.py --budget 30
 python scripts/05_validate_clean_v3.py
-python scripts/06_atm_export.py
+python scripts/06_atm_export.py            # monthly picks; repeat until ALL_DONE
+python scripts/06_atm_export.py --finalize # writes atm_export_v3/, which step 07 reads
 python scripts/07_black76_iv.py
 python scripts/08_research_panel.py
-python scripts/09_futures_settle_series.py
+python scripts/09_futures_settle_series.py            # monthly parts; repeat until ALL_DONE
+python scripts/09_futures_settle_series.py --finalize # writes the settle and return series step 10 reads
 python scripts/10_vrp.py
 ```
 
-Steps 01, 02, 04, 06 and 09 are long and take `--budget <minutes>`. They are
-resumable: call them repeatedly until they report completion.
+Steps 01, 02, 04, 06 and 09 are long and take `--budget <seconds>` (default
+30). Each call works for that long and stops: call them repeatedly until they
+print `ALL_DONE`. Steps 06 and 09 then need one more call with `--finalize`.
 
 ## Analysis layer only (steps 11–14 and the notebook)
 
@@ -95,11 +100,12 @@ python scripts/build_notebook.py       # rebuild + execute the notebook
   (static_all_roots_all_tenors) shows mean 0.2766, median 0.4925,
   t_nw63 1.7906; xs_top1_iv_z_by_date_tenor shows mean 0.5126,
   t_nw63 2.4139, t_nonoverlap21 2.7073.
-- The notebook's final cell asserts equality between its own recomputation
-  and the step 12/13 outputs and prints
+- The notebook's final cell checks its own recomputation against the step
+  12/13 outputs (to within 0.0005 on means and 0.005 on t-statistics) and prints
   `All 12 strategies match the pipeline outputs (mean and NW63 t).`
 - `diagnostics/reproduction_scorecard.csv` records the equivalent comparison
-  for steps 00–10 against the original build.
+  for steps 00 to 10 against an earlier build. That build's figures are typed
+  into the scripts as targets and the build itself is not kept.
 
 ## Rebuilding the paper PDF
 
