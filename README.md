@@ -115,12 +115,12 @@ the highest NW63 t of the twelve.
 
 ## How to run
 
-The analysis layer reruns in minutes from the working folder of step-10 outputs:
+Steps 11 to 14 rerun in minutes from the working folder of step-10 outputs:
 
 ```
 pip install -r requirements.txt                                   # Python 3.10 to 3.12
 export FX_VRP_WORK=/path/to/fx_vrp_work                           # outside this repository
-for s in 11_daily_panel 12_strategy_proxy 13_robust_stats 14_charts_tables; do python scripts/$s.py; done
+python run.py                                                     # steps 11 to 14; --from and --to pick a range
 ```
 
 The full rebuild from the Databento download:
@@ -135,20 +135,20 @@ python scripts/07_black76_iv.py
 python scripts/08_research_panel.py
 python scripts/09_futures_settle_series.py         # monthly parts; repeat until ALL_DONE
 python scripts/09_futures_settle_series.py --finalize   # writes the series that step 10 reads
-python scripts/10_vrp.py                           # then 11 to 14, in order
-python scripts/build_notebook.py
+python scripts/10_vrp.py
+python run.py                                      # steps 11 to 14
 ```
 
 Python 3.14 crashes the DBN conversion. Set both variables before running anything: with
-`FX_VRP_WORK` unset, steps 02 onward fall back to the repository folder and would overwrite the
-committed `diagnostics/` files and the notebook. The working directory grows to tens of
+`FX_VRP_WORK` unset, steps 02 to 10 fall back to the repository folder and would overwrite the
+committed `diagnostics/` files; `run.py` stops with a message. The working directory grows to tens of
 gigabytes; `results/`, `paper/figs/` and `diagnostics/` here are committed snapshots of what a
 finished run writes into it.
 
 `REPRO.md` lists the expected checkpoints: step 11 must print 70,714 daily rows; step 13 must
-report static mean 0.2766 / NW63 t 1.7906 and top-1 mean 0.5126 / NW63 t 2.4139; the notebook's
-final cell checks its own recomputation against the pipeline outputs, to within 0.0005 on means
-and 0.005 on t-statistics.
+report static mean 0.2766 / NW63 t 1.7906 and top-1 mean 0.5126 / NW63 t 2.4139. `python -m pytest -q`
+checks the same numbers when `FX_VRP_WORK` is set; the notebook only draws the committed files in
+`results/`.
 
 ## Pipeline
 
@@ -165,11 +165,11 @@ and 0.005 on t-statistics.
 | 8 | `08_research_panel.py` | research filters | 430,630 |
 | 9 | `09_futures_settle_series.py` | futures settle series and log returns | 485,057 / 482,449 |
 | 10 | `10_vrp.py` | forward realised vol and VRP panel | 430,630 (427,774 RV ok) |
-| 11 | `11_daily_panel.py` | daily (date, root, tenor) panel; 6N from 2014 | 70,714 |
-| 12 | `12_strategy_proxy.py` | 12 strategy payoff proxies, leak-free IV z | 40,887 strategy-days |
-| 13 | `13_robust_stats.py` | NW 5/21/63 t, 21-day-spaced t, skew/kurtosis | 12-row summary |
-| 14 | `14_charts_tables.py` | publication charts and tables 1 to 4 | 7 charts, 4 tables |
-| | `build_notebook.py` | build and execute `notebooks/vrp_analysis.ipynb` | notebook |
+| 11 | `fxvrp/panel.py` | daily (date, root, tenor) panel; 6N from 2014 | 70,714 |
+| 12 | `fxvrp/strategy.py`, `fxvrp/signals.py` | 12 strategy payoff proxies, leak-free IV z | 40,887 strategy-days |
+| 13 | `fxvrp/stats.py` | NW 5/21/63 t, 21-day-spaced t, skew/kurtosis | 12-row summary |
+| 14 | `fxvrp/figures.py` | publication charts and tables 1 to 4 | 7 charts, 4 tables |
+| | `notebooks/vrp_analysis.ipynb` | charts and tables from `results/` | notebook |
 
 Steps 1, 2, 4, 6 and 9 are long and accept `--budget <seconds>` (default 30). Each call works for
 that long and stops, so repeat it until it prints `ALL_DONE`. The rebuild from the Databento
@@ -181,10 +181,13 @@ comparison cannot be rerun from this repository.
 ## Repository layout
 
 ```
-scripts/            pipeline steps 00–14 + build_notebook.py
+scripts/            pipeline steps 00–10
+fxvrp/              analysis layer, steps 11–14 (panel, signals, strategy, stats, figures)
+run.py              runs steps 11–14 in order
+tests/              statistics, z-score and checkpoint tests
 paper/              vrp_paper.pdf, vrp_paper.tex, figs/ (the 7 charts, 200 dpi)
 report/             vrp_report_final.md (long-form report)
-notebooks/          vrp_analysis.ipynb (executed, outputs retained)
+notebooks/          vrp_analysis.ipynb (charts and tables from results/, outputs retained)
 results/            robust_strategy_summary_v3.csv, tables/table_1–4.csv
 diagnostics/        reproduction scorecard, coverage audits, per-root and per-year medians
 REPRO.md            working-directory layout and re-run checkpoints

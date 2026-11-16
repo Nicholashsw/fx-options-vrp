@@ -14,7 +14,7 @@ this repository**, supplied through environment variables:
 | Variable | Used by | Points at |
 |---|---|---|
 | `DATABENTO_BASE` | steps 00–01 | the directory that contains the six `GLBX-*` job folders |
-| `FX_VRP_WORK` | steps 00–14 and `build_notebook.py` | the working directory for every derived artefact |
+| `FX_VRP_WORK` | steps 00–10 and `run.py` (steps 11–14) | the working directory for every derived artefact |
 
 ```
 export DATABENTO_BASE=/path/to/databento          # holds the GLBX-2026... job folders
@@ -23,8 +23,9 @@ export FX_VRP_WORK=$DATABENTO_BASE/fx_vrp_work    # holds parquet/, clean_v3/, d
 
 Set both explicitly. Unset, `DATABENTO_BASE` falls back to the repository's
 parent directory. `FX_VRP_WORK` then falls back to `fx_vrp_work` beside the
-repository in steps 00 and 01, and to the repository root in every later step,
-where a run would overwrite the committed `diagnostics/` files and notebook.
+repository in steps 00 and 01, and to the repository root in steps 02 to 10,
+where a run would overwrite the committed `diagnostics/` files. `run.py` stops with a message
+when it is unset.
 The working directory grows to tens of gigabytes.
 
 The pipeline creates:
@@ -44,7 +45,6 @@ $FX_VRP_WORK/
       robust_stats_step13/     robust_strategy_summary_v3.csv
       charts_step14/           the 7 charts, 200 dpi
       tables_step14/           tables 1-4
-  notebooks/              vrp_analysis.ipynb, written and executed by build_notebook.py
 ```
 
 The committed `diagnostics/`, `results/` and `paper/figs/` in this repository
@@ -60,7 +60,7 @@ crashes) with the packages in `requirements.txt`.
 ```
 python scripts/00_inventory.py             # reads $DATABENTO_BASE
 python scripts/01_convert.py --budget 30   # DBN.ZST -> parquet; 30 seconds a call, repeat until it prints ALL_DONE
-python scripts/02_coverage_audit.py        # steps 02-14 use $FX_VRP_WORK only
+python scripts/02_coverage_audit.py        # steps 02-10 use $FX_VRP_WORK only
 python scripts/03_join_diagnostic.py
 python scripts/04_build_clean_v3.py --budget 30
 python scripts/05_validate_clean_v3.py
@@ -77,7 +77,7 @@ Steps 01, 02, 04, 06 and 09 are long and take `--budget <seconds>` (default
 30). Each call works for that long and stops: call them repeatedly until they
 print `ALL_DONE`. Steps 06 and 09 then need one more call with `--finalize`.
 
-## Analysis layer only (steps 11–14 and the notebook)
+## Analysis layer only (steps 11–14)
 
 Once `$FX_VRP_WORK/clean_v3/vrp_v3/` holds the step-10 outputs
 (`vrp_panel_v3.parquet`, 430,630 rows, plus `futures_returns.parquet` and
@@ -85,12 +85,14 @@ Once `$FX_VRP_WORK/clean_v3/vrp_v3/` holds the step-10 outputs
 minutes and touches nothing under `clean_v3/panel_monthly`:
 
 ```
-python scripts/11_daily_panel.py       # daily panel, expect 70,714 rows
-python scripts/12_strategy_proxy.py    # 12 payoff-proxy series
-python scripts/13_robust_stats.py      # robust_strategy_summary_v3.csv
-python scripts/14_charts_tables.py     # 7 charts + tables 1-4
-python scripts/build_notebook.py       # rebuild + execute the notebook
+python run.py                          # daily, strategy, stats, figures, in order
+python run.py --from stats --to figures    # a sub-range; the stage names are daily, strategy, stats, figures
+python -m pytest -q                    # with FX_VRP_WORK set, also checks the checkpoints below
 ```
+
+The stages write the daily panel (expect 70,714 rows), the 12 payoff-proxy series,
+`robust_strategy_summary_v3.csv`, and the 7 charts and tables 1-4. The notebook is not rebuilt by
+a run: it draws the committed files in `results/`.
 
 ## Expected checkpoints
 
@@ -100,9 +102,8 @@ python scripts/build_notebook.py       # rebuild + execute the notebook
   (static_all_roots_all_tenors) shows mean 0.2766, median 0.4925,
   t_nw63 1.7906; xs_top1_iv_z_by_date_tenor shows mean 0.5126,
   t_nw63 2.4139, t_nonoverlap21 2.7073.
-- The notebook's final cell checks its own recomputation against the step
-  12/13 outputs (to within 0.0005 on means and 0.005 on t-statistics) and prints
-  `All 12 strategies match the pipeline outputs (mean and NW63 t).`
+- `tests/test_checkpoints.py` checks the daily row count and the figures above when
+  `FX_VRP_WORK` is set. The notebook reads only `results/` and recomputes nothing.
 - `diagnostics/reproduction_scorecard.csv` records the equivalent comparison
   for steps 00 to 10 against an earlier build. That build's figures are typed
   into the scripts as targets and the build itself is not kept.
