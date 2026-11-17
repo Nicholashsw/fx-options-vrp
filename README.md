@@ -82,13 +82,13 @@ Full rules, join logic and data notes are in `report/vrp_report_final.md` §3 to
 ## Main result
 
 Implied volatility is higher than the volatility that follows in 6 of 7 currencies, and selling
-the currency whose options look most expensive nearly doubles the average payoff. Figures are in
-volatility points per day.
+the currency whose options look most expensive nearly doubles the average payoff. Figures are
+daily averages in annualised volatility points.
 
 | Result | Number |
 |---|---|
 | Median IV − RV spread positive | 6 of 7 roots; strongest JPY +0.87 vol points, NZD flat (−0.03) |
-| Static short-vol proxy, all roots and tenors | mean 0.28 vol points/day, median 0.49, positive 65.6% of days, **NW63 t = 1.79**, t on 21-day-spaced observations = 2.27 |
+| Static short-vol proxy, all roots and tenors | mean 0.28 vol points, median 0.49, positive 65.6% of days, **NW63 t = 1.79**, t on 21-day-spaced observations = 2.27 |
 | Static by tenor | 30d is the only robustly significant bucket (NW63 t = 2.40); 60d and 90d positive but weak |
 | Cross-sectional rule: short the single most IV-elevated root per date and tenor | mean **0.51**, median 0.76, positive 67.2%, **NW63 t = 2.41**, t on 21-day-spaced observations = 2.71; weaker for top-2 and top-3 |
 | Time-series thresholds (own z-score ≥ 0 / 0.5 / 1) | add little once the z-score uses trailing information only |
