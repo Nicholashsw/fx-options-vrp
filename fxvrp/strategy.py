@@ -54,6 +54,14 @@ def run():
     allp.to_parquet(os.path.join(OUTD, "strategy_daily_payoff_proxy_v3.parquet"),
                     index=False)
 
+    # Aggregates only: daily mean payoff of the static proxy and the top-1 rule.
+    (allp[allp.strategy.isin(["static_all_roots_all_tenors", "xs_top1_iv_z_by_date_tenor"])]
+        .pivot(index="date", columns="strategy", values="payoff_volpts")
+        .rename(columns={"static_all_roots_all_tenors": "static",
+                         "xs_top1_iv_z_by_date_tenor": "xs_top1"})
+        [["static", "xs_top1"]].round(6)
+        .to_csv(os.path.join(OUTD, "strategy_daily_payoff.csv")))
+
     summ = (allp.groupby("strategy")["payoff_volpts"]
                 .agg(n_days="size", mean="mean", median="median",
                      positive_pct=lambda s: 100.0 * (s > 0).mean(),
