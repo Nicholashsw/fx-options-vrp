@@ -14,7 +14,7 @@ this repository**, supplied through environment variables:
 | Variable | Used by | Points at |
 |---|---|---|
 | `DATABENTO_BASE` | steps 00–01 | the directory that contains the six `GLBX-*` job folders |
-| `FX_VRP_WORK` | steps 00–10 and `run.py` (steps 11–14) | the working directory for every derived artefact |
+| `FX_VRP_WORK` | steps 00–10 and `run.py` (steps 11–16) | the working directory for every derived artefact |
 
 ```
 export DATABENTO_BASE=/path/to/databento          # holds the GLBX-2026... job folders
@@ -77,7 +77,7 @@ Steps 01, 02, 04, 06 and 09 are long and take `--budget <seconds>` (default
 30). Each call works for that long and stops: call them repeatedly until they
 print `ALL_DONE`. Steps 06 and 09 then need one more call with `--finalize`.
 
-## Analysis layer only (steps 11–14)
+## Analysis layer only (steps 11–16)
 
 Once `$FX_VRP_WORK/clean_v3/vrp_v3/` holds the step-10 outputs
 (`vrp_panel_v3.parquet`, 430,630 rows, plus `futures_returns.parquet` and
@@ -85,8 +85,8 @@ Once `$FX_VRP_WORK/clean_v3/vrp_v3/` holds the step-10 outputs
 minutes and touches nothing under `clean_v3/panel_monthly`:
 
 ```
-python run.py                          # daily, strategy, stats, figures, in order
-python run.py --from stats --to figures    # a sub-range; the stage names are daily, strategy, stats, figures
+python run.py                          # daily, strategy, stats, figures, rvforecast, rvstrategy, in order
+python run.py --from stats --to figures    # a sub-range; the stage names are daily, strategy, stats, figures, rvforecast, rvstrategy
 python -m pytest -q                    # with FX_VRP_WORK set, also checks the checkpoints below
 ```
 

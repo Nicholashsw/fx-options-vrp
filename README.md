@@ -10,7 +10,7 @@ Nicholas Hong · Nanyang Technological University
 
 ## What I built
 
-- A 15-step pipeline that turns six Databento batch jobs (986 DBN files, 11 GB of exchange-level
+- A 17-step pipeline that turns six Databento batch jobs (986 DBN files, 11 GB of exchange-level
   CME GLBX.MDP3 statistics and definitions) into one panel of at-the-money options for seven
   currency futures: AUD (6A), GBP (6B), CAD (6C), EUR (6E), JPY (6J), NZD (6N) and CHF (6S),
   June 2010 to June 2026.
@@ -115,12 +115,12 @@ the highest NW63 t of the twelve.
 
 ## How to run
 
-Steps 11 to 14 rerun in minutes from the working folder of step-10 outputs:
+Steps 11 to 16 rerun in minutes from the working folder of step-10 outputs:
 
 ```
 pip install -r requirements.txt                                   # Python 3.10 to 3.12
 export FX_VRP_WORK=/path/to/fx_vrp_work                           # outside this repository
-python run.py                                                     # steps 11 to 14; --from and --to pick a range
+python run.py                                                     # steps 11 to 16; --from and --to pick a range
 ```
 
 The full rebuild from the Databento download:
@@ -136,7 +136,7 @@ python scripts/08_research_panel.py
 python scripts/09_futures_settle_series.py         # monthly parts; repeat until ALL_DONE
 python scripts/09_futures_settle_series.py --finalize   # writes the series that step 10 reads
 python scripts/10_vrp.py
-python run.py                                      # steps 11 to 14
+python run.py                                      # steps 11 to 16
 ```
 
 Python 3.14 crashes the DBN conversion. Set both variables before running anything: with
@@ -169,6 +169,8 @@ checks the same numbers when `FX_VRP_WORK` is set, and `tests/test_claims.py` ch
 | 12 | `fxvrp/strategy.py`, `fxvrp/signals.py` | 12 strategy payoff proxies, leak-free IV z | 40,887 strategy-days |
 | 13 | `fxvrp/stats.py` | NW 5/21/63 t, 21-day-spaced t, skew/kurtosis | 12-row summary |
 | 14 | `fxvrp/figures.py` | publication charts and tables 1 to 4 | 7 charts, 4 tables |
+| 15 | `fxvrp/rvforecast.py` | walk-forward forward-RV forecasts: IV, HAR, HAR-IV, XGBoost, LSTM | `results/ml/forecast_metrics.csv`, `dm_tests.csv` |
+| 16 | `fxvrp/rvstrategy.py` | top-1 short-vol rule ranked by forecast-based VRP vs IV z-score | `results/ml/ml_strategy_summary.csv` |
 | | `notebooks/vrp_analysis.ipynb` | charts and tables from `results/` | notebook |
 
 Steps 1, 2, 4, 6 and 9 are long and accept `--budget <seconds>` (default 30). Each call works for
@@ -182,13 +184,13 @@ comparison cannot be rerun from this repository.
 
 ```
 scripts/            pipeline steps 00–10
-fxvrp/              analysis layer, steps 11–14 (panel, signals, strategy, stats, figures)
-run.py              runs steps 11–14 in order
+fxvrp/              analysis layer, steps 11–16 (panel, signals, strategy, stats, figures, rvforecast, rvstrategy)
+run.py              runs steps 11–16 in order
 tests/              statistics, z-score, checkpoint and claim tests (test_claims.py needs no data)
 paper/              vrp_paper.pdf, vrp_paper.tex, figs/ (the 7 charts, 200 dpi)
 report/             vrp_report_final.md (long-form report)
 notebooks/          vrp_analysis.ipynb (charts and tables from results/, outputs retained)
-results/            robust_strategy_summary_v3.csv, data_checks.csv, tables/table_1–4.csv
+results/            robust_strategy_summary_v3.csv, data_checks.csv, tables/table_1–4.csv, ml/ (steps 15–16)
 diagnostics/        reproduction scorecard, coverage audits, per-root and per-year medians
 REPRO.md            working-directory layout and re-run checkpoints
 DATA.md             data sources, job specification, licensing

@@ -1,10 +1,11 @@
-"""Run the analysis layer: daily, strategy, stats, figures."""
+"""Run the analysis layer: daily, strategy, stats, figures, rvforecast, rvstrategy."""
 import argparse
 
-from fxvrp import config, figures, panel, stats, strategy
+from fxvrp import config, figures, panel, rvforecast, rvstrategy, stats, strategy
 
 STAGES = [("daily", panel.run), ("strategy", strategy.run),
-          ("stats", stats.run), ("figures", figures.run)]
+          ("stats", stats.run), ("figures", figures.run),
+          ("rvforecast", rvforecast.run), ("rvstrategy", rvstrategy.run)]
 NAMES = [name for name, _ in STAGES]
 
 parser = argparse.ArgumentParser(description=__doc__)
