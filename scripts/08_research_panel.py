@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Step 7: research IV panel.
+"""Step 8: research IV panel.
 keep iv_status in (ok, ok_near_intrinsic); 1% <= IV <= 80%;
 drop 6N before 2013-01-01. Save research_iv_panel_v3.parquet."""
 import os

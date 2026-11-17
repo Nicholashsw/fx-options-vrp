@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Step 3a: join diagnostic on benchmark months, replicating the exact V3
+"""Step 3: join diagnostic on benchmark months, replicating the exact V3
 dedup+join recipe. Targets from the prior laptop:
   2016-01 old all roots : defs_dedup=7,241  settle_rows=121,044  fut_missing=0.0
   2024-01 new migrated  : defs_dedup=11,992 settle_rows=233,574  fut_missing=0.0

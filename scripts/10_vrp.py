@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Step 8b: forward realized vol + VRP per option row.
+"""Step 10: forward realized vol + VRP per option row.
 Window: (t, t+H] calendar days on the option's own future_symbol series.
 realized_var = 252/n * sum(r2)  (trading-day annualization; sum_r2, n_returns,
 span_days stored so alternative conventions can be recomputed).

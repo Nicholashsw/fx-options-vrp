@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Step 3b: build clean_v3 monthly panel.
+"""Step 4: build clean_v3 monthly panel.
 V3 source rule:
   month <  2017-07 : opt_old, all 7 roots
   month >= 2017-07 : opt_new (ADU/GBU/CAU/EUU/JPU/CHU -> 6A/6B/6C/6E/6J/6S)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Step 8a: daily futures settlement series + consecutive log returns.
+"""Step 9: daily futures settlement series + consecutive log returns.
 Per month: fut_stats stat_type 3 dedup (date, instrument_id) keep last,
 inner-join same-month fut_defs (class F) dedup -> (date, symbol, settle).
 Global: dedup (date, future_symbol); returns per symbol with gap guard

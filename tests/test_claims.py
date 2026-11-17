@@ -175,6 +175,14 @@ CLAIMS = [
     ("paper", "from # to 1.79", "10.4", lambda: S(STATIC, "t_naive")),
     ("paper", "averages t=# across offsets", "2.71", lambda: S(TOP1, "t_nonoverlap21")),
     ("paper", "static strategy #.", "2.27", lambda: S(STATIC, "t_nonoverlap21")),
+    ("paper", "2013, # legacy 6N option rows", "612", lambda: C("n6_2013_rows_iv_above_20")),
+    ("paper", "(median #, highest 39.9)", "28.5", lambda: C("n6_2013_iv_above_20_median_iv")),
+    ("paper", "highest #) against a median", "39.9", lambda: C("n6_2013_iv_above_20_max_iv")),
+    ("paper", "realized volatility of #%", "9.5", lambda: C("n6_2013_iv_above_20_median_rv")),
+    ("report", "2013, # legacy 6N option rows", "612", lambda: C("n6_2013_rows_iv_above_20")),
+    ("report", "(median #, highest 39.9)", "28.5", lambda: C("n6_2013_iv_above_20_median_iv")),
+    ("report", "highest #) against a median", "39.9", lambda: C("n6_2013_iv_above_20_max_iv")),
+    ("report", "realized volatility of # percent", "9.5", lambda: C("n6_2013_iv_above_20_median_rv")),
     # report
     ("report", "the final daily panel contains # root-tenor observations", "70,714", lambda: C("daily_rows")),
     ("report", "volatility spread of # volatility points (median", "0.28", lambda: S(STATIC, "mean")),
@@ -227,11 +235,7 @@ CLAIMS = [
 ]
 
 # Claims with no committed source file. They fail until one exists.
-UNSOURCED = [
-    ("paper", "30--40% volatility against roughly 8% realized", "2010 to 2013 6N IV and RV levels: the committed panel starts 6N in 2013 (steps 8 drops earlier years), so the 2010-2012 figures have no committed source; 2013 alone gives median IV 28.5 and median RV 9.5"),
-    ("report", "30 to 40 percent volatility against roughly 8 percent", "same as above"),
-    ("report", "roughly 8,500 duplicate rows", "no committed log of the duplicates removed by the global deduplication"),
-]
+UNSOURCED = []
 
 
 def decimals(s):

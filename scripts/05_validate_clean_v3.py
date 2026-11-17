@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Step 4: validate clean_v3 vs prior-laptop targets."""
+"""Step 5: validate clean_v3 vs prior-laptop targets."""
 import os, glob
 import numpy as np
 import pandas as pd
