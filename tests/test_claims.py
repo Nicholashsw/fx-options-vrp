@@ -119,8 +119,8 @@ CLAIMS = [
     ("README", "nearest of the #, 60 and 90-day", "30", lambda: 30),  # setting: TENORS in scripts/06_atm_export.py
     ("README", "must print # daily rows", "70,714", lambda: C("daily_rows")),
     ("README", "| 193 files, # |", "32,525,006", lambda: D("clean_v3 total rows")),
-    ("README", "| 440,467 |", "440,467", lambda: ATM_ROOT.rows.sum()),
-    ("README", "| 440,462 valid |", "440,462", lambda: D("valid IV rows")),
+    ("README", "| # |", "440,467", lambda: ATM_ROOT.rows.sum()),
+    ("README", "| # valid |", "440,462", lambda: D("valid IV rows")),
     ("README", "research filters | # |", "430,630", lambda: D("final research rows")),
     ("README", "| # / 482,449 |", "485,057", lambda: C("futures_settle_rows")),
     ("README", "| 485,057 / # |", "482,449", lambda: C("futures_return_rows")),
@@ -128,7 +128,7 @@ CLAIMS = [
     ("README", "430,630 (# RV ok)", "427,774", lambda: C("option_rows_rv_ok")),
     ("README", "# strategy-days", "40,887", lambda: SUMMARY.n_days.sum()),
     ("README", "| daily (date, root, tenor) panel; 6N from 2014 | # |", "70,714", lambda: C("daily_rows")),
-    ("README", "(7 on average)", "7", lambda: C("tenor_diff_days_mean")),
+    ("README", "(# on average)", "7", lambda: C("tenor_diff_days_mean")),
     ("README", "up to # days from that target", "15", lambda: C("tenor_diff_days_max")),
     ("README", "# percent of its daily cells have no recorded open interest", "76.6", lambda: C("n6_from_2014_cells_no_open_interest_pct")),
     # paper
@@ -150,7 +150,7 @@ CLAIMS = [
     ("paper", "above 20% and zero open interest, # are 6N", "102", lambda: C("cells_iv_above_20_no_open_interest_6N_2013")),
     ("paper", "#% of 6N daily cells carry zero open interest", "76.6", lambda: C("n6_from_2014_cells_no_open_interest_pct")),
     ("paper", "inverts # of 440,467", "440,462", lambda: D("valid IV rows")),
-    ("paper", "(99.999%)", "99.999", lambda: 100 * 440462 / 440467),
+    ("paper", "(#%)", "99.999", lambda: 100 * 440462 / 440467),
     ("paper", "(2,856 of #,", "430,630", lambda: C("option_rows_all")),
     ("paper", "excluded, leaving # valid", "427,774", lambda: C("option_rows_rv_ok")),
     ("paper", "(# after the 6N exclusion)", "424,248", lambda: C("option_rows_ok_after_6N_exclusion")),
@@ -227,7 +227,11 @@ CLAIMS = [
 ]
 
 # Claims with no committed source file. They fail until one exists.
-UNSOURCED = []
+UNSOURCED = [
+    ("paper", "30--40% volatility against roughly 8% realized", "2010 to 2013 6N IV and RV levels: the committed panel starts 6N in 2013 (steps 8 drops earlier years), so the 2010-2012 figures have no committed source; 2013 alone gives median IV 28.5 and median RV 9.5"),
+    ("report", "30 to 40 percent volatility against roughly 8 percent", "same as above"),
+    ("report", "roughly 8,500 duplicate rows", "no committed log of the duplicates removed by the global deduplication"),
+]
 
 
 def decimals(s):
@@ -249,9 +253,9 @@ def test_claim(doc, template, printed, source):
         assert abs(float(source()) - number(printed)) <= tol, f"source gives {source()}"
 
 
-@pytest.mark.parametrize("doc,claim,why", UNSOURCED, ids=[u[1][:50] for u in UNSOURCED])
-def test_unsourced(doc, claim, why):
-    pytest.fail(f"no source file: {claim} ({doc}); {why}")
+@pytest.mark.parametrize("doc,template,why", UNSOURCED, ids=[u[1][:50] for u in UNSOURCED])
+def test_unsourced(doc, template, why):
+    pytest.fail(f"no source file: {template} ({doc}); {why}")
 
 
 # ---- tables: every cell of the strategy, root and tenor tables --------------
@@ -355,3 +359,125 @@ def test_setting(file, pattern):
 def test_chart_and_table_counts():
     assert len([f for f in os.listdir(path("paper", "figs")) if f.endswith(".png")]) == 7
     assert len(os.listdir(path("results", "tables"))) == 4
+
+
+# ---- coverage: every number in the three documents ---------------------------
+#
+# prose() removes markup, table rows (checked cell by cell above) and the numbers
+# in CLAIMS and UNSOURCED. What is left is checked here: a number must be a year,
+# an enumerator or a reference (classify), be in ALLOW with a one-word reason, or
+# be in MENTIONS with a source for a result quoted again in other words.
+
+FILES = {"README": ("README.md",), "paper": ("paper", "vrp_paper.tex"),
+         "report": ("report", "vrp_report_final.md")}
+NUM = re.compile(r"(?<![A-Za-z_\d.\-])-?\d+(?:,\d{3})*(?:\.\d+)?(?![A-Za-z_\d])")
+TABLE_LINE = re.compile(r"^(?:(?:static|signal|xs)_|6[A-Z] \(|\| ?(?:6[A-Z] |\d\dd |static_|signal_|xs_))")
+
+
+def blank_numbers(match):
+    return NUM.sub("@", match.group(0))
+
+
+def prose(doc):
+    """The document's prose with markup, table rows and claimed numbers replaced."""
+    text = read(*FILES[doc])
+    if doc == "paper":
+        text = text.split("\\begin{document}")[1]
+        text = re.sub(r"\\begin\{equation\}.*?\\end\{equation\}", " ", text, flags=re.S)
+        text = re.sub(r"\\(?:begin|end)\{[^}]*\}(?:\{[^}]*\})?", " ", text)
+        text = re.sub(r"\\(?:label|ref|includegraphics)(?:\[[^\]]*\])?\{[^}]*\}", " ", text)
+        text = re.sub(r"\\[a-zA-Z]+", " ", text)
+        text = re.sub(r"(?m)^%.*$", "", text)
+    else:
+        text = re.sub(r"```.*?```", " ", text, flags=re.S)
+        text = re.sub(r"`[^`]*`", " ", text)
+        text = re.sub(r"\]\([^)]*\)", "] ", text)
+    lines = [norm(l) for l in text.split("\n")]
+    text = "\n".join(l for l in lines if not TABLE_LINE.match(l))  # cells: table tests
+    for d, template, printed, _ in CLAIMS:
+        if d == doc:
+            pattern = re.escape(norm(template)).replace(r"\ ", r"\s+").replace("\\#", "(?P<n>" + re.escape(printed) + ")")
+            text = re.sub(pattern, lambda m: m.group(0).replace(m.group("n"), "@", 1), text)
+    for d, template, _ in UNSOURCED:
+        if d == doc:
+            text = re.sub(re.escape(norm(template)).replace(r"\ ", r"\s+"), blank_numbers, text)
+    return re.sub(r"[\^_]\{?\d", " ", text)
+
+
+# Numbers that are settings, labels or counts checked elsewhere. One-word reasons.
+ALLOW = {
+    "30": "tenor", "60": "tenor", "90": "tenor", "45": "setting", "75": "setting", "46": "setting",
+    "74": "setting", "10": "setting", "130": "setting", "0.10": "setting", "20": "setting",
+    "252": "setting", "126": "setting", "365.25": "setting", "14": "setting", "5": "setting",
+    "21": "setting", "63": "setting", "0": "setting", "0.5": "setting", "1": "setting",
+    "1.0": "setting", "2": "setting", "3": "setting", "25": "name", "7": "count", "6": "count",
+    "8": "name", "9": "step", "4": "count", "11": "step", "12": "count", "13": "step", "00": "step",
+    "15": "count", "16": "count", "1.96": "constant", "3.14": "version", "22": "count",
+}
+
+# Results quoted again outside a CLAIMS row: any occurrence of the number in that
+# document is accepted if one of its sources rounds to it.
+MENTIONS = {
+    "0.49": [lambda: S(STATIC, "median"), lambda: T2(90, "median_vrp_spread")],
+    "0.50": [lambda: T2(60, "median_vrp_spread")],
+    "0.51": [lambda: S(TOP1, "mean")],
+    "0.28": [lambda: S(STATIC, "mean")],
+    "0.38": [lambda: S("signal_iv_zscore_ge_0", "mean")],
+    "67.2": [lambda: S(TOP1, "positive_pct")],
+    "7.0": [lambda: S(STATIC, "excess_kurtosis")],
+    "-1.69": [lambda: S(STATIC, "skew")],
+    "1.79": [lambda: S(STATIC, "t_nw63")],
+    "1.7906": [lambda: S(STATIC, "t_nw63")],
+    "2.41": [lambda: S(TOP1, "t_nw63")],
+    "2.4139": [lambda: S(TOP1, "t_nw63")],
+    "2.27": [lambda: S(STATIC, "t_nonoverlap21")],
+    "2.40": [lambda: S("static_30d", "t_nw63")],
+    "2.21": [lambda: S("static_ex_6N", "t_nw63")],
+    "986": [lambda: INVENTORY.n_files.sum()],
+    "193": [lambda: len(BUILD)],
+    "427,774": [lambda: C("option_rows_rv_ok")],
+    "482,449": [lambda: C("futures_return_rows")],
+    "2,856": [lambda: C("option_rows_rv_excluded")],
+    "70,714": [lambda: C("daily_rows")],
+    "440,467": [lambda: ATM_ROOT.rows.sum()],
+    "32,525,026": [lambda: D("clean_v3 total rows", "target_prior_laptop")],
+    "32.5": [lambda: D("clean_v3 total rows") / 1e6],
+    "20": [lambda: D("clean_v3 total rows", "target_prior_laptop") - D("clean_v3 total rows")],
+    "0.00006": [lambda: 100 * 20 / D("clean_v3 total rows", "target_prior_laptop")],
+    "21 of the 22": [],
+}
+
+
+def classify(text, m):
+    """A reason when the number is plainly not a result: a year, enumerator or reference."""
+    line_start = text.rfind("\n", 0, m.start()) + 1
+    before, num = text[max(0, m.start() - 25):m.start()], m.group()
+    if re.fullmatch(r"(?:19|20)\d\d", num):
+        return "year"
+    if re.search(r"(?:Section|Table|Figure|Chart|Step|Steps|step|steps|stat_types?|\u00a7)[~ ]*$", before):
+        return "reference"
+    head = text[line_start:m.start()]
+    if re.fullmatch(r"[#\- ]*(?:\|? ?)[A-Z]?(?:\d+\.)*", head.strip()) and re.fullmatch(r"\d+(?:\.\d+)?", num):
+        return "enumerator"
+    if re.search(r"(?:steps?|Steps) [\d, ]*(?:and |to )?$", before) and re.fullmatch(r"\d+", num):
+        return "reference"
+    return None
+
+
+def accepted(doc, text, m):
+    num = m.group()
+    if classify(text, m):
+        return "classified"
+    if num in MENTIONS and any(abs(float(f()) - number(num)) <= 0.5 * 10 ** -decimals(num) + 1e-9 for f in MENTIONS[num]):
+        return "mention"
+    if num in ALLOW:
+        return "allowed"
+    return None
+
+
+@pytest.mark.parametrize("doc", list(FILES))
+def test_every_number_is_accounted_for(doc):
+    text = prose(doc)
+    bad = [(m.group(), text[max(0, m.start() - 35):m.end() + 20].replace("\n", " "))
+           for m in NUM.finditer(text) if not accepted(doc, text, m)]
+    assert not bad, "\n".join(f"{n!r} in ...{ctx}..." for n, ctx in bad)
