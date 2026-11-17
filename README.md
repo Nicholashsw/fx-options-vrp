@@ -113,14 +113,6 @@ the highest NW63 t of the twelve.
 - The reported rule is the best of twelve variants, and the 6N cut-off was set with hindsight, so
   neither is an out-of-sample result.
 
-## What I learned
-
-<!-- TODO Nick: three bullets in your own words. -->
-
-- 
-- 
-- 
-
 ## How to run
 
 The analysis layer reruns in minutes from the working folder of step-10 outputs:
