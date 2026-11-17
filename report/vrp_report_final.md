@@ -116,7 +116,7 @@ The ATM panel applies the following filters: positive option settlement, positiv
 
 ### 3.6 The 6N anomaly
 
-Legacy 6N implied volatility in 2010 through 2013 contains a structurally anomalous regime: repeated settlement prints implying 30 to 40 percent volatility against roughly 8 percent contemporaneous realized volatility, exclusively on contracts with zero open interest. Solver diagnostics rule out inversion failure. Of the 103 daily panel cells sample-wide with implied volatility above 20 percent and zero open interest, 102 are 6N cells in 2013; high-implied days for every other root coincide with genuine stress episodes (2011 euro area crisis, Brexit, the SNB de-peg, COVID). An earlier version of this study excluded 6N before 2013; the finalization pass documented that the anomaly persists through 2013, so 6N enters the sample on 2014-01-01. This removes 3,526 option-level observations. 6N remains the thinnest market in the panel (roughly 78 percent of its daily cells carry zero open interest), which is retained as a caveat on all 6N results.
+Legacy 6N implied volatility in 2010 through 2013 contains a structurally anomalous regime: repeated settlement prints implying 30 to 40 percent volatility against roughly 8 percent contemporaneous realized volatility, exclusively on contracts with zero open interest. Solver diagnostics rule out inversion failure. Of the 128 daily panel cells sample-wide with implied volatility above 20 percent and zero open interest, 102 are 6N cells in 2013; high-implied days for every other root coincide with genuine stress episodes (2011 euro area crisis, Brexit, the SNB de-peg, COVID). An earlier version of this study excluded 6N before 2013; the finalization pass documented that the anomaly persists through 2013, so 6N enters the sample on 2014-01-01. This removes 3,526 option-level observations. 6N remains the thinnest market in the panel (76.6 percent of its daily cells carry zero open interest), which is retained as a caveat on all 6N results.
 
 ---
 
@@ -273,7 +273,7 @@ As an independent check, each daily payoff series is sampled every 21 observatio
 8. Event risk and macro announcements are not explicitly modelled.
 9. Forward RV windows overlap; this is addressed with Newey-West and non-overlapping sampling but remains a structural feature of the design.
 10. The headline conditional strategy is the best of twelve tested variants; its significance should be discounted for specification search, as discussed in Section 5.5.
-11. 6N results carry a thin-market caveat throughout: roughly 78 percent of its daily cells have zero open interest even in the clean sample.
+11. 6N results carry a thin-market caveat throughout: 76.6 percent of its daily cells have zero open interest even in the clean sample.
 
 ---
 

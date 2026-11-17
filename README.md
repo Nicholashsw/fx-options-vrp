@@ -147,7 +147,7 @@ finished run writes into it.
 
 `REPRO.md` lists the expected checkpoints: step 11 must print 70,714 daily rows; step 13 must
 report static mean 0.2766 / NW63 t 1.7906 and top-1 mean 0.5126 / NW63 t 2.4139. `python -m pytest -q`
-checks the same numbers when `FX_VRP_WORK` is set; the notebook only draws the committed files in
+checks the same numbers when `FX_VRP_WORK` is set, and `tests/test_claims.py` checks every result number in this README, the paper and the report against `results/` without data; the notebook only draws the committed files in
 `results/`.
 
 ## Pipeline
@@ -184,11 +184,11 @@ comparison cannot be rerun from this repository.
 scripts/            pipeline steps 00–10
 fxvrp/              analysis layer, steps 11–14 (panel, signals, strategy, stats, figures)
 run.py              runs steps 11–14 in order
-tests/              statistics, z-score and checkpoint tests
+tests/              statistics, z-score, checkpoint and claim tests (test_claims.py needs no data)
 paper/              vrp_paper.pdf, vrp_paper.tex, figs/ (the 7 charts, 200 dpi)
 report/             vrp_report_final.md (long-form report)
 notebooks/          vrp_analysis.ipynb (charts and tables from results/, outputs retained)
-results/            robust_strategy_summary_v3.csv, tables/table_1–4.csv
+results/            robust_strategy_summary_v3.csv, data_checks.csv, tables/table_1–4.csv
 diagnostics/        reproduction scorecard, coverage audits, per-root and per-year medians
 REPRO.md            working-directory layout and re-run checkpoints
 DATA.md             data sources, job specification, licensing
